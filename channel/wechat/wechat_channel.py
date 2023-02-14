@@ -12,6 +12,7 @@ from common.log import logger
 from config import conf
 import requests
 import io
+from urllib import request, parse
 
 thread_pool = ThreadPoolExecutor(max_workers=8)
 
@@ -32,9 +33,15 @@ class WechatChannel(Channel):
     def __init__(self):
         pass
 
+    def ec(e):
+        print('exit')
+        data = parse.urlencode({ 'text': 'ChatGPT WX Logout' }).encode()
+        req = request.Request("https://api.chanify.net/v1/sender/CIDshaMGEiJBQUxFTUtDSVU3WVpJV09ZUUtURjZKQ0RMSVlTQ1NIMllNIgIIAQ.KEY5d0w8jzFIAPjbR5JVliWQKJFmCgWoEQlXwIXJCbc", data=data)
+        request.urlopen(req)
+
     def startup(self):
         # login by scan QRCode
-        itchat.auto_login(enableCmdQR=2)
+        itchat.auto_login(enableCmdQR=2, exitCallback=self.ec)
 
         # start message listener
         itchat.run()
