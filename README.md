@@ -67,6 +67,7 @@ cd chatgpt-on-wechat/
 ```bash
 pip3 install itchat-uos==1.5.0.dev0
 pip3 install --upgrade openai
+pip3 install schedule
 ```
 注：`itchat-uos`使用指定版本1.5.0.dev0，`openai`使用最新版本，需高于0.25.0。
 

@@ -31,9 +31,13 @@ def handler_group_msg(msg):
 
 class WechatChannel(Channel):
     def __init__(self):
-        pass
+        self.is_login = False
 
-    def ec(e):
+    def lc(self):
+        print('login')
+        self.is_login = True
+
+    def ec(self, e):
         print('exit')
         data = parse.urlencode({ 'text': 'ChatGPT WX Logout' }).encode()
         req = request.Request("https://api.chanify.net/v1/sender/CIDshaMGEiJBQUxFTUtDSVU3WVpJV09ZUUtURjZKQ0RMSVlTQ1NIMllNIgIIAQ.KEY5d0w8jzFIAPjbR5JVliWQKJFmCgWoEQlXwIXJCbc", data=data)
@@ -41,7 +45,7 @@ class WechatChannel(Channel):
 
     def startup(self):
         # login by scan QRCode
-        itchat.auto_login(enableCmdQR=2, exitCallback=self.ec)
+        itchat.auto_login(enableCmdQR=2,loginCallback=self.lc, exitCallback=self.ec)
 
         # start message listener
         itchat.run()
@@ -162,6 +166,10 @@ class WechatChannel(Channel):
                 return prefix
         return None
 
+    def getGroupNameByGroupID(self, grounName):
+        return itchat.search_chatrooms(name=grounName)[0]["UserName"]
+    def sendGrounpMsg(self, msg, groupID):
+        self.send(msg, groupID)
 
     def check_contain(self, content, keyword_list):
         if not keyword_list:
