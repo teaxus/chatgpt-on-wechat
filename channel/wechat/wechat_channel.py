@@ -13,6 +13,7 @@ from config import conf
 import requests
 import io
 from urllib import request, parse
+from PushHelper.push_helper import PushHelper
 
 thread_pool = ThreadPoolExecutor(max_workers=8)
 
@@ -39,9 +40,7 @@ class WechatChannel(Channel):
 
     def ec(self, e):
         print('exit')
-        data = parse.urlencode({ 'text': 'ChatGPT WX Logout' }).encode()
-        req = request.Request("https://api.chanify.net/v1/sender/CIDshaMGEiJBQUxFTUtDSVU3WVpJV09ZUUtURjZKQ0RMSVlTQ1NIMllNIgIIAQ.KEY5d0w8jzFIAPjbR5JVliWQKJFmCgWoEQlXwIXJCbc", data=data)
-        request.urlopen(req)
+        PushHelper().pushMsg("ChatGPT WX Logout")
 
     def startup(self):
         # login by scan QRCode
