@@ -38,7 +38,7 @@ class WechatChannel(Channel):
         print('login')
         self.is_login = True
 
-    def ec(self, e):
+    def ec(self):
         print('exit')
         PushHelper().pushMsg("ChatGPT WX Logout")
 
