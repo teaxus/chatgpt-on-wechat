@@ -39,8 +39,8 @@ class WechatChannel(Channel):
         self.is_login = True
 
     def ec(self):
-        print('exit')
         PushHelper().pushMsg("ChatGPT WX Logout")
+        print('exit')
 
     def startup(self):
         # login by scan QRCode
