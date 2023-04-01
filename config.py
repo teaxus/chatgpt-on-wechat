@@ -74,7 +74,12 @@ available_setting = {
     # channel配置
     "channel_type": "wx", # 通道类型，支持wx,wxy和terminal
 
-
+    # 自己定义的 ------- Begin
+    # 错误推送的key
+    "pushToken": "",
+    # 自动推送表
+    "schedule" : []
+    # 自己定义的 ------- End
 }
 
 

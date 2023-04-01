@@ -10,6 +10,7 @@ import time
 import threading
 import schedule
 from bridge.bridge import Bridge
+from bridge.context import *
 
 from PushHelper.push_helper import PushHelper
 from plugins import *
@@ -28,8 +29,14 @@ def run():
         def job(make_statement):
             if channel.is_login:
                 groupID = channel.getGroupNameByGroupID(make_statement["group_title"])
-                msg = Bridge().fetch_reply_content(make_statement["make_statement"], {"from_user_id":groupID,"type":"TEXT"})
-                channel.sendGrounpMsg(make_statement["at_who"] + " " +msg, groupID)
+                context = Context()
+                context.type = ContextType.TEXT
+                context['session_id'] = groupID
+                context['receiver'] = groupID
+                context.content = make_statement["make_statement"]
+                msg = Bridge().fetch_reply_content(context.content, context)
+                msg.content = make_statement["at_who"] + " " + msg.content
+                channel.sendGrounpMsg(msg, context)
             else:
                 PushHelper().pushMsg("未登录定时任务异常")
 
@@ -38,7 +45,7 @@ def run():
                 schedule.run_pending()
                 time.sleep(1)
 
-        arrSchedult = config.conf().get("schedule")
+        arrSchedult = conf().get("schedule")
         for schedult_item in arrSchedult:
             if schedult_item["repet"]:
                 schedule.every().day.at(schedult_item["time"]).do(job, schedult_item)
