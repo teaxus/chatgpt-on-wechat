@@ -1,6 +1,8 @@
 # encoding:utf-8
 
 import config
+from config import conf, load_config
+from channel import channel_factory
 from common.log import logger
 from urllib import request, parse
 from channel import channel_factory
@@ -8,22 +10,33 @@ import time
 import threading
 import schedule
 from bridge.bridge import Bridge
+from bridge.context import *
 
 from PushHelper.push_helper import PushHelper
+from plugins import *
 
-if __name__ == '__main__':
+def run():
     try:
         # load config
-        config.load_config()
+        load_config()
         # create channel
-        channel = channel_factory.create_channel("wx")
+        channel_name=conf().get('channel_type', 'wx')
+        channel = channel_factory.create_channel(channel_name)
+        if channel_name in ['wx','wxy']:
+            PluginManager().load_plugins()
 
         # 建立定时任务
         def job(make_statement):
             if channel.is_login:
                 groupID = channel.getGroupNameByGroupID(make_statement["group_title"])
-                msg = Bridge().fetch_reply_content(make_statement["make_statement"], {"from_user_id":groupID,"type":"TEXT"})
-                channel.sendGrounpMsg(make_statement["at_who"] + " " +msg, groupID)
+                context = Context()
+                context.type = ContextType.TEXT
+                context['session_id'] = groupID
+                context['receiver'] = groupID
+                context.content = make_statement["make_statement"]
+                msg = Bridge().fetch_reply_content(context.content, context)
+                msg.content = make_statement["at_who"] + " " + msg.content
+                channel.sendGrounpMsg(msg, context)
             else:
                 PushHelper().pushMsg("未登录定时任务异常")
 
@@ -32,7 +45,7 @@ if __name__ == '__main__':
                 schedule.run_pending()
                 time.sleep(1)
 
-        arrSchedult = config.conf().get("schedule")
+        arrSchedult = conf().get("schedule")
         for schedult_item in arrSchedult:
             if schedult_item["repet"]:
                 schedule.every().day.at(schedult_item["time"]).do(job, schedult_item)
@@ -44,3 +57,6 @@ if __name__ == '__main__':
     except Exception as e:
         logger.error("App startup failed!")
         logger.exception(e)
+
+if __name__ == '__main__':
+    run()
